@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="sl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#00022D" />
+    <title>Test branja imen</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="back" href="../">‹ Nazaj</a>
+      <h1 id="title"></h1>
+    </header>
+
+    <main>
+      <p id="status" class="status"></p>
+
+      <div id="camera" class="camera">
+        <video id="video" playsinline muted autoplay></video>
+        <div id="frame" class="frame"><span></span></div>
+        <div id="chip" class="chip" hidden></div>
+      </div>
+
+      <section class="result">
+        <p id="text" class="text">–</p>
+        <dl class="stats">
+          <div><dt id="lblConfidence"></dt><dd id="confidence">–</dd></div>
+          <div><dt id="lblLast"></dt><dd id="last">–</dd></div>
+          <div><dt id="lblAvg"></dt><dd id="avg">–</dd></div>
+          <div><dt id="lblCount"></dt><dd id="count">0</dd></div>
+        </dl>
+      </section>
+
+      <section class="options">
+        <div class="segmented" role="group">
+          <button id="modeLine" class="seg active" type="button"></button>
+          <button id="modeBlock" class="seg" type="button"></button>
+        </div>
+        <button id="torch" class="secondary" type="button" hidden></button>
+      </section>
+
+      <section class="saved">
+        <h2 id="savedTitle"></h2>
+        <p id="savedHint" class="hint"></p>
+        <ol id="savedList"></ol>
+      </section>
+
+      <section class="device">
+        <p id="device" class="hint"></p>
+        <div class="row">
+          <button id="copy" class="secondary" type="button"></button>
+          <button id="clear" class="secondary" type="button"></button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bottombar">
+      <button id="startStop" class="primary" type="button" disabled></button>
+    </footer>
+
+    <div id="toast" class="toast" hidden></div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
