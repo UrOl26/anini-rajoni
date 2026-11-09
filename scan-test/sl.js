@@ -1,0 +1,41 @@
+// All user-facing text for the cloud scan test page, in Slovenian.
+export const sl = {
+  title: 'Test skeniranja (splet)',
+  keyTitle: 'API ključ',
+  keyHint: 'Ključ se shrani samo na tem telefonu.',
+  keyPlaceholder: 'sk-ant-…',
+  keySave: 'Shrani ključ',
+  keyDelete: 'Izbriši ključ',
+  keySaved: 'Ključ je shranjen na tem telefonu.',
+  keyMissing: 'Najprej vpiši API ključ.',
+  ready: 'Pripravljeno. Usmeri kamero v ime na nabiralniku.',
+  cameraStarting: 'Zaganjam kamero …',
+  cameraFailed: 'Kamere ni bilo mogoče odpreti. Preveri dovoljenje za kamero.',
+  reading: 'Berem …',
+  paused: 'Branje je ustavljeno.',
+  start: 'Začni brati',
+  stop: 'Ustavi',
+  noName: 'Ni berljivega imena',
+  lastRead: 'Zadnje branje',
+  average: 'Povprečje',
+  reads: 'Branj',
+  cost: 'Strošek',
+  torchOn: 'Prižgi svetilko',
+  torchOff: 'Ugasni svetilko',
+  savedTitle: 'Prebrana imena',
+  savedHint: 'Ime se shrani takoj, ko ga bralnik prebere.',
+  copy: 'Kopiraj rezultate',
+  clear: 'Počisti',
+  copied: 'Rezultati so kopirani.',
+  cleared: 'Rezultati so počiščeni.',
+  errAuth: 'Ključ ni veljaven. Preveri ga.',
+  errNetwork: 'Ni povezave z internetom.',
+  errBusy: 'Strežnik je zaseden. Poskušam znova …',
+  errOther: 'Branje ni uspelo.',
+  device: 'Naprava',
+  camera: 'Kamera',
+};
+
+// Slovenian number formatting: decimal comma
+export const fmt = (n, digits = 1) =>
+  n.toLocaleString('sl-SI', { minimumFractionDigits: digits, maximumFractionDigits: digits });

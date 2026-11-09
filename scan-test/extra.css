@@ -1,0 +1,21 @@
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card h2 { font-size: 20px; margin: 0 0 4px; }
+#keyForm { display: grid; gap: 8px; }
+#keyInput {
+  min-height: 56px;
+  padding: 0 12px;
+  font-size: 18px;
+  border: 2px solid #9ca3af;
+  border-radius: 12px;
+  width: 100%;
+}
+#keyInput:focus { outline: none; border-color: var(--primary); }
+.ok { color: var(--success); font-weight: 700; margin: 0 0 8px; }
+.ok::before { content: '✓ '; }
+#keyStored .secondary { width: 100%; }
+.text.empty { color: var(--text-2); font-weight: 400; font-size: 22px; }

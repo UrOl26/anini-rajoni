@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         ocrTest: 'ocr-test/index.html',
+        scanTest: 'scan-test/index.html',
       },
     },
   },

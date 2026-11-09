@@ -19,4 +19,5 @@ Pushing to `main` deploys to GitHub Pages (`.github/workflows/deploy.yml`).
 ## Pages
 
 - `/` – app (in progress)
-- `/ocr-test/` – test page for live name reading (speed and accuracy)
+- `/scan-test/` – test page for cloud name reading with Claude Haiku (`src/lib/cloudReader.js`). The API key is entered on the phone and kept in localStorage only.
+- `/ocr-test/` – test page for on-device name reading with Tesseract.js (rejected: can't read handwriting or engraved metal)
