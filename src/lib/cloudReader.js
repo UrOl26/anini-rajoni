@@ -59,10 +59,8 @@ export function canvasToJpegBase64(canvas, quality = 0.8) {
   return canvas.toDataURL('image/jpeg', quality).split(',')[1];
 }
 
-/**
- * Sends one label image and returns { names, ms, costUsd }.
- */
-export async function readNames(base64Jpeg, apiKey, { signal } = {}) {
+/** Sends one image with instructions and a JSON schema; returns { result, ms, costUsd }. */
+async function ask(base64Jpeg, apiKey, { system, schema, text, maxTokens = 200, signal }) {
   const t0 = performance.now();
   let res;
   try {
@@ -77,21 +75,15 @@ export async function readNames(base64Jpeg, apiKey, { signal } = {}) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 200,
-        system: SYSTEM_PROMPT,
-        output_config: {
-          effort: 'low',
-          format: { type: 'json_schema', schema: SCHEMA },
-        },
+        max_tokens: maxTokens,
+        system,
+        output_config: { effort: 'low', format: { type: 'json_schema', schema } },
         messages: [
           {
             role: 'user',
             content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: 'image/jpeg', data: base64Jpeg },
-              },
-              { type: 'text', text: 'Which family names are on this mailbox label?' },
+              { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64Jpeg } },
+              { type: 'text', text },
             ],
           },
         ],
@@ -112,21 +104,84 @@ export async function readNames(base64Jpeg, apiKey, { signal } = {}) {
 
   const data = await res.json();
   const ms = performance.now() - t0;
-  const text = data.content?.find((b) => b.type === 'text')?.text ?? '{"names":[]}';
-  let names = [];
+  const out = data.content?.find((b) => b.type === 'text')?.text ?? '{}';
+  let result = {};
   try {
-    names = JSON.parse(text).names ?? [];
+    result = JSON.parse(out);
   } catch {
-    names = [];
+    result = {};
   }
-  names = names
-    .map((n) => String(n).trim())
-    .filter(Boolean)
-    .slice(0, 5);
-
   const u = data.usage ?? {};
   const costUsd =
     ((u.input_tokens ?? 0) * PRICE_IN + (u.output_tokens ?? 0) * PRICE_OUT) / 1_000_000;
+  return { result, ms, costUsd };
+}
 
-  return { names, ms, costUsd };
+const cleanList = (list, max) =>
+  (Array.isArray(list) ? list : [])
+    .map((n) => String(n).trim())
+    .filter(Boolean)
+    .slice(0, max);
+
+/** Reads the family names on one mailbox label. Returns { names, ms, costUsd }. */
+export async function readNames(base64Jpeg, apiKey, { signal } = {}) {
+  const { result, ms, costUsd } = await ask(base64Jpeg, apiKey, {
+    system: SYSTEM_PROMPT,
+    schema: SCHEMA,
+    text: 'Which family names are on this mailbox label?',
+    signal,
+  });
+  return { names: cleanList(result.names, 5), ms, costUsd };
+}
+
+const LETTER_PROMPT = `You read the recipient on a letter or parcel in Slovenia.
+You get a list of family names that exist on this mailbox wall.
+- "matches": the names FROM THE LIST that are the recipient's family name. Use the list spelling exactly. Ignore differences in capital letters, č/š/ž and small misreadings. Empty if none fits.
+- "words": every word on the envelope that could be the recipient's family name (not street, town, post code, sender, or words like "ga.", "g.", "družina"), spelled exactly with č, š, ž, in normal capitalisation. Most likely first. At most 8.`;
+
+const LETTER_SCHEMA = {
+  type: 'object',
+  properties: {
+    matches: { type: 'array', items: { type: 'string' } },
+    words: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['matches', 'words'],
+  additionalProperties: false,
+};
+
+/** Reads the recipient on a letter and matches it to the names on the wall. */
+export async function readLetter(base64Jpeg, apiKey, wallNames, { signal } = {}) {
+  const { result } = await ask(base64Jpeg, apiKey, {
+    system: LETTER_PROMPT,
+    schema: LETTER_SCHEMA,
+    text: `Names on this wall: ${JSON.stringify(wallNames)}\nWho is this letter for?`,
+    maxTokens: 300,
+    signal,
+  });
+  const allowed = new Set(wallNames);
+  return {
+    matches: cleanList(result.matches, 10).filter((n) => allowed.has(n)),
+    words: cleanList(result.words, 8),
+  };
+}
+
+const ADDRESS_PROMPT = `You read a street address in Slovenia from a house number sign or a letter.
+Return it as "<street> <house number>", for example "Celovška cesta 12" or "Trg OF 7a". Use correct č, š, ž and normal capitalisation. Leave out post code, town and names. If an entrance is shown (vhod A), add ", vhod A". If no address is readable, return an empty string.`;
+
+const ADDRESS_SCHEMA = {
+  type: 'object',
+  properties: { address: { type: 'string' } },
+  required: ['address'],
+  additionalProperties: false,
+};
+
+/** Reads a street address. Returns '' if none was found. */
+export async function readAddress(base64Jpeg, apiKey, { signal } = {}) {
+  const { result } = await ask(base64Jpeg, apiKey, {
+    system: ADDRESS_PROMPT,
+    schema: ADDRESS_SCHEMA,
+    text: 'What is the address?',
+    signal,
+  });
+  return String(result.address ?? '').trim();
 }

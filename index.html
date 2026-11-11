@@ -4,37 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#00022D" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Anini Rajoni" />
+    <link rel="icon" href="/anini-rajoni/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/anini-rajoni/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/anini-rajoni/icons/apple-touch-icon.png" />
     <title>Anini Rajoni</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 24px 16px;
-        font-family: Lato, -apple-system, system-ui, sans-serif;
-        font-size: 18px;
-        line-height: 1.3;
-        background: #f5f6f8;
-        color: #111827;
-      }
-      h1 { font-size: 22px; }
-      a.button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 56px;
-        border-radius: 12px;
-        background: #00022d;
-        color: #fff;
-        font-weight: 700;
-        text-decoration: none;
-      }
-      a.button + a.button { margin-top: 12px; }
-      a.button.secondary { background: #fff; color: #00022d; border: 2px solid #00022d; }
-    </style>
   </head>
   <body>
-    <h1>Anini Rajoni</h1>
-    <p>Aplikacija je v izdelavi.</p>
-    <a class="button" href="./scan-test/">Test skeniranja (splet)</a>
-    <a class="button secondary" href="./ocr-test/">Test branja imen (brez povezave)</a>
+    <div id="app"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

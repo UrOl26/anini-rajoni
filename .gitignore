@@ -150,4 +150,3 @@ vite.config.ts.timestamp-*
 
 # Generated
 dist/
-public/ocr/

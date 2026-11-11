@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "PWA za pismonošo: kje je čigav nabiralnik",
   "scripts": {
-    "copy-ocr": "node scripts/copy-ocr-assets.mjs",
-    "dev": "npm run copy-ocr && vite",
-    "build": "npm run copy-ocr && vite build",
+    "dev": "vite",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "repository": {
@@ -17,14 +16,14 @@
   },
   "homepage": "https://github.com/UrOl26/anini-rajoni#readme",
   "dependencies": {
-    "@tesseract.js-data/slv": "^1.0.0",
-    "preact": "^11.2.0",
-    "tesseract.js": "^7.0.0",
-    "tesseract.js-core": "^7.0.0"
+    "@fontsource/lato": "^5.3.0",
+    "idb-keyval": "^6.3.0",
+    "preact": "^11.2.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "vite-plugin-pwa": "^2.0.0"
   },
   "private": true,
   "type": "module"
