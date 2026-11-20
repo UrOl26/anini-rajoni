@@ -25,14 +25,14 @@ const NAMES_MIN_SCALE = 0.8;
 const LABEL_MIN_W = 26;
 
 // Screen height without the keyboard. While the keyboard is open the window is shorter,
-// so the tallest height seen for the current width is used (reset when the phone is turned).
-let stable = { w: 0, h: 0 };
+// so the tallest height ever seen at the current width is used. Kept per width, so turning
+// the phone sideways and back finds the full upright height again.
+const tallest = new Map();
 function screenHeight() {
   const w = window.innerWidth;
-  const h = window.innerHeight;
-  if (w !== stable.w) stable = { w, h };
-  else stable.h = Math.max(stable.h, h);
-  return stable.h;
+  const h = Math.max(tallest.get(w) ?? 0, window.innerHeight);
+  tallest.set(w, h);
+  return h;
 }
 
 /** Pixel sizes of the grid at scale s. */
@@ -108,11 +108,27 @@ export function Grid({
 
   useLayoutEffect(fit, [zoomable, fitKey, layout.rows, layout.cols]);
 
+  // Refit after the phone is turned, once the new size has settled.
   useEffect(() => {
     if (!zoomable) return;
-    const onResize = () => fitRef.current();
+    // Only a change of width (turning the phone) refits – the keyboard changes just the height.
+    let timer;
+    let lastW = window.innerWidth;
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (window.innerWidth === lastW) return;
+        lastW = window.innerWidth;
+        fitRef.current();
+      }, 300);
+    };
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onResize);
+    };
   }, [zoomable]);
 
   // ---- Zoom ----

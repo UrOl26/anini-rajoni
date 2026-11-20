@@ -1,14 +1,77 @@
 // Sheets for one mailbox: editing its names, and "learning while delivering" (5.3, 5.5).
-import { useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { sl } from '../i18n/sl.js';
-import { MAX_NAMES_PER_MAILBOX } from '../lib/names.js';
+import { MAX_NAMES_PER_MAILBOX, normalizeName } from '../lib/names.js';
+import { readNames, canvasToJpegBase64, getApiKey } from '../lib/cloudReader.js';
+import { signature, sameView } from '../lib/camera.js';
 import { Sheet, Icon, toast } from './ui.jsx';
+import { CameraView, useReadLoop, scanBlocker, readerErrorMessage } from './Camera.jsx';
+import { ScanBlocked } from './ScanBlocked.jsx';
+
+/** Full-screen camera that reads the family names on one label, then closes. */
+function LabelScanner({ onFound, onClose }) {
+  const blocked = scanBlocker();
+  const cam = useRef(null);
+  const last = useRef(null);
+  const [status, setStatus] = useState(sl.scanOneHint);
+  const [running, setRunning] = useState(!blocked);
+
+  useReadLoop(running, async (alive) => {
+    const canvas = cam.current?.grab();
+    if (!canvas) return true;
+    const sig = signature(canvas);
+    if (sameView(sig, last.current)) return true; // nothing new to read
+    try {
+      setStatus(sl.reading);
+      const { names } = await readNames(canvasToJpegBase64(canvas), getApiKey());
+      if (!alive()) return false;
+      last.current = sig;
+      if (names.length) {
+        onFound(names);
+        return false;
+      }
+      setStatus(sl.noName);
+    } catch (err) {
+      const { text, fatal } = readerErrorMessage(err);
+      setStatus(text);
+      if (fatal) {
+        setRunning(false);
+        return false;
+      }
+    }
+    return true;
+  });
+
+  return (
+    <div class="fullcam">
+      {!blocked && (
+        <CameraView
+          shape="label"
+          status={status}
+          onReady={(api) => (cam.current = api)}
+          onError={() => {
+            setStatus(sl.cameraFailed);
+            setRunning(false);
+          }}
+        />
+      )}
+      <div class="panel">
+        {blocked && <ScanBlocked reason={blocked} />}
+        <button class="btn btn-secondary" type="button" onClick={onClose}>
+          {sl.cancel}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Edit, delete or add the names of one mailbox.
  * addNew: also start with an empty row for a new name (manual entry in the scanner).
+ * scan: show "Skeniraj priimek" – read a label with the camera and add the names as new rows.
  */
-export function NamesSheet({ title, names, onSave, onCancel, addNew = false }) {
+export function NamesSheet({ title, names, onSave, onCancel, addNew = false, scan = false }) {
+  const [scanning, setScanning] = useState(false);
   const [draft, setDraft] = useState(() => {
     if (!names.length) return [''];
     if (addNew && names.length < MAX_NAMES_PER_MAILBOX) return [...names, ''];
@@ -18,6 +81,21 @@ export function NamesSheet({ title, names, onSave, onCancel, addNew = false }) {
   const add = () => {
     if (draft.length >= MAX_NAMES_PER_MAILBOX) return toast(sl.maxNames);
     setDraft([...draft, '']);
+  };
+  const addScanned = (read) => {
+    setScanning(false);
+    const out = draft.filter((n) => n.trim());
+    const seen = new Set(out.map(normalizeName));
+    for (const n of read) {
+      if (seen.has(normalizeName(n))) continue;
+      if (out.length >= MAX_NAMES_PER_MAILBOX) {
+        toast(sl.maxNames);
+        break;
+      }
+      out.push(n);
+      seen.add(normalizeName(n));
+    }
+    setDraft(out.length ? out : ['']);
   };
   return (
     <Sheet onClose={onCancel}>
@@ -47,6 +125,11 @@ export function NamesSheet({ title, names, onSave, onCancel, addNew = false }) {
         <button class="btn btn-secondary" type="button" onClick={add}>
           + {sl.addName}
         </button>
+        {scan && (
+          <button class="btn btn-secondary" type="button" onClick={() => setScanning(true)}>
+            <Icon.camera /> {sl.scanOneName}
+          </button>
+        )}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <button class="btn btn-secondary" type="button" onClick={onCancel}>
             {sl.cancel}
@@ -56,6 +139,7 @@ export function NamesSheet({ title, names, onSave, onCancel, addNew = false }) {
           </button>
         </div>
       </div>
+      {scanning && <LabelScanner onFound={addScanned} onClose={() => setScanning(false)} />}
     </Sheet>
   );
 }

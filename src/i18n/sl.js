@@ -64,9 +64,15 @@ export const sl = {
   editHint: 'Tapni nabiralnik, ki ni v uporabi.',
   confirmRemoveNamed: 'Si prepričana, da želiš izbrisati? Ti nabiralniki imajo vpisane priimke.',
   notInUse: 'Nabiralnik ni v uporabi',
+  confirmDisableNamed: (n) => `Res želiš onemogočiti nabiralnik ${n}? Vsebuje priimke.`,
+  disableNote:
+    'Priimki na onemogočenem nabiralniku ne bodo izbrisani, samo onemogočeni. Če nabiralnik ponovno omogočiš, se bodo priimki pojavili nazaj.',
+  disableMailbox: 'Onemogoči nabiralnik',
 
   // 5.3 Scanner
   scanNames: 'Skeniraj priimke',
+  scanOneName: 'Skeniraj priimek',
+  scanOneHint: 'Usmeri kamero v priimek na nabiralniku.',
   enterManually: 'Vpiši ročno',
   previousMailbox: 'Prejšnji nabiralnik',
   nextMailbox: 'Naslednji nabiralnik',

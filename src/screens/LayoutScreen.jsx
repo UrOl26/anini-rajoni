@@ -125,10 +125,10 @@ export function LayoutScreen({ locationId }) {
           </button>
         </div>
 
-        {searching && (picked || matches.length === 1) && matches.length > 0 && (
+        {searching && picked && matches.length > 0 && (
           <p class="position-line">{matches.map((m) => sl.mailbox(m.n)).join(' · ')}</p>
         )}
-        {searching && !picked && matches.length > 1 && (
+        {searching && !picked && matches.length > 0 && (
           <ul class="match-list">
             {matches.map((m) => {
               const name = suggestedName(m.key);
@@ -181,6 +181,7 @@ export function LayoutScreen({ locationId }) {
         <NamesSheet
           title={sl.mailbox(sheet.cell.n)}
           names={namesOf(layout, sheet.cell.key)}
+          scan
           onCancel={() => setSheet(null)}
           onSave={(names) => saveNames(sheet.cell.key, names)}
         />
