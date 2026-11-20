@@ -89,7 +89,7 @@ export function LearnSheet({ name, n, names, onSave, onCancel }) {
       <Sheet onClose={onCancel}>
         <p class="question">{sl.replaceWhich(name)}</p>
         <div class="stack">
-          <button class="btn btn-primary" type="button" onClick={() => onSave([name])}>
+          <button class="btn btn-secondary" type="button" onClick={() => onSave([name])}>
             {sl.allNames}
           </button>
           {names.map((old, i) => (
@@ -102,7 +102,7 @@ export function LearnSheet({ name, n, names, onSave, onCancel }) {
               {old}
             </button>
           ))}
-          <button class="btn btn-secondary" type="button" onClick={onCancel}>
+          <button class="btn btn-primary" type="button" onClick={onCancel}>
             {sl.cancel}
           </button>
         </div>
@@ -119,7 +119,7 @@ export function LearnSheet({ name, n, names, onSave, onCancel }) {
       {full && <p class="hint">{sl.maxNames}</p>}
       <div class="stack">
         {!full && (
-          <button class="btn btn-primary" type="button" onClick={() => onSave([...names, name])}>
+          <button class="btn btn-secondary" type="button" onClick={() => onSave([...names, name])}>
             {one ? sl.addToExistingOne : sl.addToExistingMany}
           </button>
         )}
@@ -132,7 +132,7 @@ export function LearnSheet({ name, n, names, onSave, onCancel }) {
             {sl.replaceMany}
           </button>
         )}
-        <button class="btn btn-secondary" type="button" onClick={onCancel}>
+        <button class="btn btn-primary" type="button" onClick={onCancel}>
           {sl.cancel}
         </button>
       </div>

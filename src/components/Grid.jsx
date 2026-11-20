@@ -24,6 +24,17 @@ const ZOOM_STEP = 1.3;
 const NAMES_MIN_SCALE = 0.8;
 const LABEL_MIN_W = 26;
 
+// Screen height without the keyboard. While the keyboard is open the window is shorter,
+// so the tallest height seen for the current width is used (reset when the phone is turned).
+let stable = { w: 0, h: 0 };
+function screenHeight() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  if (w !== stable.w) stable = { w, h };
+  else stable.h = Math.max(stable.h, h);
+  return stable.h;
+}
+
 /** Pixel sizes of the grid at scale s. */
 function sizes(s) {
   return {
@@ -83,9 +94,10 @@ export function Grid({
   const fit = () => {
     const wrap = wrapRef.current;
     if (!zoomable || !wrap) return;
-    const top = wrap.getBoundingClientRect().top;
+    // Position on the page (not on the screen), so an open keyboard that scrolls the page doesn't matter.
+    const top = wrap.getBoundingClientRect().top + window.scrollY;
     const bar = document.querySelector('.bottombar')?.offsetHeight ?? 0;
-    const h = Math.max(160, window.innerHeight - top - bar - 8);
+    const h = Math.max(160, screenHeight() - top - bar - 8);
     const availW = wrap.clientWidth - WRAP_PAD_X - ZOOM_BTNS_W;
     const s = fitScale(layout.rows, layout.cols, availW, h - WRAP_PAD_Y);
     setWrapH(h);

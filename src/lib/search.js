@@ -1,4 +1,6 @@
-// Forgiving search: ignores capital letters and č/š/ž, and forgives small typos.
+// Search that ignores capital letters and č/š/ž.
+// Family names: no typo forgiveness (Popravki 3) – the typed letters must appear in the name.
+// Addresses: small typos are still forgiven.
 import { normalizeName } from './names.js';
 
 function levenshtein(a, b, max) {
@@ -20,8 +22,9 @@ function levenshtein(a, b, max) {
 const allowedTypos = (len) => (len >= 7 ? 2 : len >= 4 ? 1 : 0);
 
 /** Does one query word match one word of the text? */
-function wordMatches(q, word) {
+function wordMatches(q, word, typos) {
   if (word.startsWith(q) || word.includes(q)) return true;
+  if (!typos) return false;
   const max = allowedTypos(q.length);
   if (!max) return false;
   // Compare with the start of the word (typing in progress) and the whole word.
@@ -32,13 +35,13 @@ function wordMatches(q, word) {
 }
 
 /** True if every word of the query matches some word of the text. */
-export function matchesText(query, text) {
+export function matchesText(query, text, { typos = true } = {}) {
   const q = normalizeName(query).split(/[\s,.\-/]+/).filter(Boolean);
   if (!q.length) return false;
   const full = normalizeName(text);
   if (full.includes(q.join(' '))) return true;
   const words = full.split(/[\s,.\-/]+/).filter(Boolean);
-  return q.every((qw) => words.some((w) => wordMatches(qw, w)));
+  return q.every((qw) => words.some((w) => wordMatches(qw, w, typos)));
 }
 
 /** "Celovška cesta 26, vhod A" → "celovska cesta 26": for comparing a scanned address with saved ones. */

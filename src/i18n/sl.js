@@ -116,7 +116,7 @@ export const sl = {
   replaceExistingOne: 'Zamenjaj obstoječe',
   replaceMany: 'Zamenjaj',
   replaceWhich: (name) => `Kaj zamenjam s priimkom ${name}?`,
-  allNames: 'Vsi priimki',
+  allNames: 'Vse priimke',
 
   // Settings and backups
   settings: 'Nastavitve',

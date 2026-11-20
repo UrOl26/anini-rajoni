@@ -12,6 +12,7 @@ import { NamesSheet, LearnSheet } from '../components/MailboxSheets.jsx';
 import { LetterScanner } from '../components/LetterScanner.jsx';
 
 const MIN_QUERY = 2;
+const EXACT = { typos: false }; // a different family name is never a match (Popravki 3)
 
 /** "zupan" → "Zupan"; keeps text that already has capitals. */
 const asName = (text) => {
@@ -39,7 +40,7 @@ export function LayoutScreen({ locationId }) {
       const p = normalizeName(picked);
       return cells.filter((cell) => namesOf(layout, cell.key).some((name) => normalizeName(name) === p));
     }
-    return cells.filter((cell) => namesOf(layout, cell.key).some((name) => matchesText(q, name)));
+    return cells.filter((cell) => namesOf(layout, cell.key).some((name) => matchesText(q, name, EXACT)));
   }, [q, picked, layout]);
   const matchKeys = new Set(matches.map((m) => m.key));
   const learning = searching && !matches.length;
@@ -81,7 +82,7 @@ export function LayoutScreen({ locationId }) {
   /** The family name of a suggestion: the one in that mailbox that matches what was typed. */
   const suggestedName = (key) => {
     const names = namesOf(layout, key);
-    return names.find((name) => matchesText(q, name)) ?? names[0];
+    return names.find((name) => matchesText(q, name, EXACT)) ?? names[0];
   };
 
   return (

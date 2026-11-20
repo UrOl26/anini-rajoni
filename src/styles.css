@@ -22,6 +22,8 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* No double-tap zoom anywhere: a quick second tap is just a second tap. */
+html, body, button, input, a { touch-action: manipulation; }
 
 html, body {
   margin: 0;
@@ -427,11 +429,14 @@ h1, h2, p { margin: 0; }
 
 /* Zoomable grid: scrolls inside its own box, + / − buttons in the corner. */
 .grid-zoom { position: relative; }
-.grid-wrap.zoomable { touch-action: pan-x pan-y; overscroll-behavior: contain; }
+.grid-wrap.zoomable,
+.grid-wrap.zoomable .cell { touch-action: pan-x pan-y; overscroll-behavior: contain; }
+/* Always bottom right, just above the bottom bar – the keyboard doesn't move them. */
 .zoom-btns {
-  position: absolute;
-  right: 0;
-  bottom: 12px;
+  position: fixed;
+  z-index: 5;
+  right: 16px;
+  bottom: calc(92px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
   gap: 8px;
