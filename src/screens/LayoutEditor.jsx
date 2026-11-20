@@ -43,7 +43,7 @@ export function LayoutEditor({ locationId, isNew }) {
           <Stepper label={sl.cols} value={draft.cols} min={MIN_SIZE} max={MAX_SIZE} onChange={(c) => requestSize(draft.rows, c)} />
         </div>
         <p style="color:var(--text-2);font-size:16px;margin-bottom:8px">{sl.editHint}</p>
-        <Grid layout={draft} mode="edit" onCellTap={toggle} />
+        <Grid layout={draft} mode="edit" onCellTap={toggle} zoomable />
       </main>
       <BottomBar>
         <div class="row">

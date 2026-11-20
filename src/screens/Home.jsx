@@ -12,7 +12,8 @@ import {
   findRoute,
 } from '../store.js';
 import { activeCells } from '../lib/layout.js';
-import { matchesText } from '../lib/search.js';
+import { matchesText, addressBase } from '../lib/search.js';
+import { AddressScanner } from './AddLocation.jsx';
 import { CardList } from '../components/CardList.jsx';
 import { TopBar, BottomBar, Sheet, Confirm, InputSheet, Icon } from '../components/ui.jsx';
 
@@ -24,6 +25,16 @@ export function Home() {
   const [reorder, setReorder] = useState(null); // array of ids while reordering
   const [menuFor, setMenuFor] = useState(null);
   const [dialog, setDialog] = useState(null); // 'add' | 'rename' | 'delete'
+  const [scanning, setScanning] = useState(false);
+
+  /** A scanned address: open its location straight away, or show what was read in the search. */
+  const onScannedAddress = (address) => {
+    setScanning(false);
+    const base = addressBase(address);
+    const exact = data.locations.filter((l) => findRoute(l.routeId) && addressBase(l.address) === base);
+    if (exact.length === 1) navigate(paths.location(exact[0].id));
+    else setQuery(exact.length > 1 ? base : address);
+  };
 
   const routeCards = (ids) =>
     ids.map((id) => {
@@ -108,6 +119,9 @@ export function Home() {
               <Icon.x />
             </button>
           )}
+          <button class="icon-btn" type="button" aria-label={sl.scanAddress} onClick={() => setScanning(true)}>
+            <Icon.camera />
+          </button>
         </div>
 
         {q ? (
@@ -162,6 +176,8 @@ export function Home() {
           {sl.addRoute}
         </button>
       </BottomBar>
+
+      {scanning && <AddressScanner onClose={() => setScanning(false)} onFound={onScannedAddress} />}
 
       {menuFor && !dialog && (
         <Sheet onClose={() => setMenuFor(null)}>

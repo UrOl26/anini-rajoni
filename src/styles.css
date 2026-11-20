@@ -358,10 +358,10 @@ h1, h2, p { margin: 0; }
   transition: transform 150ms var(--ease), opacity 150ms var(--ease);
 }
 .cell.named { border-color: var(--text); }
-.cell .num { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.cell .num { font-size: var(--label-px, 18px); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
 .cell .name {
   width: 100%;
-  font-size: 15px;
+  font-size: var(--name-px, 15px);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -403,6 +403,52 @@ h1, h2, p { margin: 0; }
   border-radius: 4px;
 }
 .grid.edit .cell { cursor: pointer; }
+
+/* Choosing a mailbox for a new family name (5.5): every active mailbox glows green. */
+.cell.pick {
+  background: #dcfce7;
+  border: 3px solid var(--success);
+  padding: 2px 4px;
+}
+
+/* Small zoom levels: less padding, thinner highlight borders. */
+.grid.z-label .cell { padding: 1px 3px; }
+.grid.z-empty .cell { padding: 0; }
+.grid.z-label .cell.current,
+.grid.z-label .cell.match,
+.grid.z-label .cell.pick,
+.grid.z-empty .cell.current,
+.grid.z-empty .cell.match,
+.grid.z-empty .cell.pick { border-width: 2px; padding: 0 2px; }
+.grid.z-label .cell.just-saved::after,
+.grid.z-empty .cell.just-saved::after { font-size: 14px; }
+.grid.z-label .cell.match,
+.grid.z-empty .cell.match { transform: none; }
+
+/* Zoomable grid: scrolls inside its own box, + / − buttons in the corner. */
+.grid-zoom { position: relative; }
+.grid-wrap.zoomable { touch-action: pan-x pan-y; overscroll-behavior: contain; }
+.zoom-btns {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.zoom-btns .icon-btn {
+  background: var(--card);
+  border: 2px solid var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 2, 45, 0.18);
+}
+.zoom-btns .icon-btn:disabled { opacity: 0.35; }
+
+/* Family name not on this wall */
+.search.not-found,
+.search.not-found:focus-within { border-color: var(--danger); }
+.not-found-note { margin: -4px 0 12px; }
+.not-found-note p { color: var(--danger); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.pick-hint { font-size: 18px; font-weight: 700; margin: 0; }
 
 .position-line {
   margin: 0 0 12px;

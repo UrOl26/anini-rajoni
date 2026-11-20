@@ -6,9 +6,15 @@ export const NEW_LAYOUT = { rows: 1, cols: 10, disabled: {}, names: {} };
 
 export const cellKey = (r, c) => `${r}-${c}`;
 
+/** Row letter like a chessboard: 0 → A, 1 → B … (max 20 rows → T). */
+export const rowLetter = (r) => String.fromCharCode(65 + r);
+
+/** Mailbox label: column number + row letter, e.g. "5C". Counted physically, disabled cells included. */
+export const cellLabel = (r, c) => `${c + 1}${rowLetter(r)}`;
+
 /**
  * Active mailboxes in scan order (top left, row by row, left to right),
- * each with its number (1, 2, 3 …). Disabled cells are skipped.
+ * each with its label `n` (e.g. "5C"). Disabled cells are skipped.
  */
 export function activeCells(layout) {
   const out = [];
@@ -16,15 +22,10 @@ export function activeCells(layout) {
   for (let r = 0; r < layout.rows; r++) {
     for (let c = 0; c < layout.cols; c++) {
       const key = cellKey(r, c);
-      if (!layout.disabled[key]) out.push({ r, c, key, n: out.length + 1 });
+      if (!layout.disabled[key]) out.push({ r, c, key, n: cellLabel(r, c) });
     }
   }
   return out;
-}
-
-/** Map from cell key to mailbox number, for active cells only. */
-export function numberMap(layout) {
-  return new Map(activeCells(layout).map((cell) => [cell.key, cell.n]));
 }
 
 /** Names of a cell (hidden while the cell is disabled, but kept). */

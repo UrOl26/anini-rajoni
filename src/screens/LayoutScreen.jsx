@@ -1,10 +1,11 @@
-// The mailbox wall of one location: name search, results, and the grid (5.4, 5.5).
+// The mailbox wall of one location: family-name search, results, and the grid (5.4, 5.5).
 import { useMemo, useRef, useState } from 'preact/hooks';
 import { sl } from '../i18n/sl.js';
 import { navigate, paths } from '../router.js';
 import { findLocation, setMailboxNames } from '../store.js';
 import { activeCells, namesOf } from '../lib/layout.js';
 import { matchesText } from '../lib/search.js';
+import { normalizeName } from '../lib/names.js';
 import { Grid } from '../components/Grid.jsx';
 import { TopBar, BottomBar, Icon, toast } from '../components/ui.jsx';
 import { NamesSheet, LearnSheet } from '../components/MailboxSheets.jsx';
@@ -23,7 +24,8 @@ export function LayoutScreen({ locationId }) {
   const layout = loc.layout;
   const inputRef = useRef();
   const [query, setQuery] = useState('');
-  const [focusKey, setFocusKey] = useState(null);
+  const [picked, setPicked] = useState(null); // family name chosen from the suggestions: exact match only
+  const [adding, setAdding] = useState(false); // choosing a mailbox for a family name that isn't here yet
   const [sheet, setSheet] = useState(null); // { type: 'names' | 'learn', cell }
   const [letter, setLetter] = useState(false);
 
@@ -33,10 +35,13 @@ export function LayoutScreen({ locationId }) {
 
   const matches = useMemo(() => {
     if (!searching) return [];
+    if (picked) {
+      const p = normalizeName(picked);
+      return cells.filter((cell) => namesOf(layout, cell.key).some((name) => normalizeName(name) === p));
+    }
     return cells.filter((cell) => namesOf(layout, cell.key).some((name) => matchesText(q, name)));
-  }, [q, layout]);
+  }, [q, picked, layout]);
   const matchKeys = new Set(matches.map((m) => m.key));
-  const centerKey = focusKey && matchKeys.has(focusKey) ? focusKey : matches[0]?.key;
   const learning = searching && !matches.length;
 
   const wallNames = useMemo(
@@ -44,20 +49,39 @@ export function LayoutScreen({ locationId }) {
     [layout],
   );
 
+  const search = (text, exact = null) => {
+    setQuery(text);
+    setPicked(exact);
+    setAdding(false);
+  };
+
   const tapCell = (cell) => {
     if (cell.disabled) return;
-    setSheet({ type: learning ? 'learn' : 'names', cell });
+    if (adding && learning) {
+      const existing = namesOf(layout, cell.key);
+      // An empty mailbox gets the name right away; Ana already chose to add it.
+      if (!existing.length) saveNames(cell.key, [asName(q)]);
+      else setSheet({ type: 'learn', cell });
+      return;
+    }
+    setSheet({ type: 'names', cell });
   };
 
   const saveNames = (key, names) => {
     if (!setMailboxNames(locationId, key, names)) return toast(sl.maxNames);
     setSheet(null);
+    setAdding(false);
   };
 
   const clear = () => {
-    setQuery('');
-    setFocusKey(null);
+    search('');
     inputRef.current?.focus();
+  };
+
+  /** The family name of a suggestion: the one in that mailbox that matches what was typed. */
+  const suggestedName = (key) => {
+    const names = namesOf(layout, key);
+    return names.find((name) => matchesText(q, name)) ?? names[0];
   };
 
   return (
@@ -73,12 +97,12 @@ export function LayoutScreen({ locationId }) {
             title={sl.editLayout}
             onClick={() => navigate(paths.editLayout(locationId))}
           >
-            <Icon.edit />
+            <Icon.grid />
           </button>
         }
       />
       <main class="content">
-        <div class="search">
+        <div class={`search${learning ? ' not-found' : ''}`}>
           <input
             ref={inputRef}
             type="search"
@@ -88,10 +112,7 @@ export function LayoutScreen({ locationId }) {
             autoComplete="off"
             autoCorrect="off"
             spellcheck={false}
-            onInput={(e) => {
-              setQuery(e.currentTarget.value);
-              setFocusKey(null);
-            }}
+            onInput={(e) => search(e.currentTarget.value)}
           />
           {query && (
             <button class="icon-btn" type="button" aria-label={sl.clearSearch} onClick={clear}>
@@ -103,44 +124,61 @@ export function LayoutScreen({ locationId }) {
           </button>
         </div>
 
-        {searching && matches.length === 1 && (
-          <p class="position-line">{sl.position(matches[0].n, matches[0].r + 1, matches[0].c + 1)}</p>
+        {searching && (picked || matches.length === 1) && matches.length > 0 && (
+          <p class="position-line">{matches.map((m) => sl.mailbox(m.n)).join(' · ')}</p>
         )}
-        {searching && matches.length > 1 && (
+        {searching && !picked && matches.length > 1 && (
           <ul class="match-list">
-            {matches.map((m) => (
-              <li key={m.key}>
-                <button type="button" onClick={() => setFocusKey(m.key)}>
-                  <strong>{namesOf(layout, m.key).join(', ')}</strong>
-                  {sl.position(m.n, m.r + 1, m.c + 1)}
-                </button>
-              </li>
-            ))}
+            {matches.map((m) => {
+              const name = suggestedName(m.key);
+              return (
+                <li key={m.key}>
+                  <button type="button" onClick={() => search(name, name)}>
+                    <strong>{namesOf(layout, m.key).join(', ')}</strong>
+                    {sl.mailbox(m.n)}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
         {learning && (
-          <p class="no-results">
-            <strong>{sl.noResults}</strong>
-            <span>{sl.tapMailboxToAdd(asName(q))}</span>
-          </p>
+          <div class="not-found-note">
+            <p>{sl.nameNotHere}</p>
+            {adding ? (
+              <p class="pick-hint">{sl.tapMailboxToAdd(asName(q))}</p>
+            ) : (
+              <button class="btn btn-secondary" type="button" onClick={() => setAdding(true)}>
+                + {sl.addName}
+              </button>
+            )}
+          </div>
         )}
 
         <Grid
           layout={layout}
           matches={matchKeys}
-          centerKey={centerKey}
+          picking={adding && learning}
           onCellTap={tapCell}
+          zoomable
+          fitKey={`${q}|${picked}|${adding}|${matches.length}`}
         />
       </main>
       <BottomBar>
-        <button class="btn btn-primary" type="button" onClick={() => navigate(paths.scan(locationId))}>
-          {sl.scanNames}
-        </button>
+        {adding && learning ? (
+          <button class="btn btn-secondary" type="button" onClick={() => setAdding(false)}>
+            {sl.cancel}
+          </button>
+        ) : (
+          <button class="btn btn-primary" type="button" onClick={() => navigate(paths.scan(locationId))}>
+            {sl.scanNames}
+          </button>
+        )}
       </BottomBar>
 
       {sheet?.type === 'names' && (
         <NamesSheet
-          title={sl.position(sheet.cell.n, sheet.cell.r + 1, sheet.cell.c + 1)}
+          title={sl.mailbox(sheet.cell.n)}
           names={namesOf(layout, sheet.cell.key)}
           onCancel={() => setSheet(null)}
           onSave={(names) => saveNames(sheet.cell.key, names)}
@@ -165,13 +203,11 @@ export function LayoutScreen({ locationId }) {
           }}
           onMatch={(found) => {
             setLetter(false);
-            setQuery(found[0]);
-            setFocusKey(null);
+            search(found[0], found[0]);
           }}
           onPick={(word) => {
             setLetter(false);
-            setQuery(word);
-            setFocusKey(null);
+            search(word);
           }}
         />
       )}

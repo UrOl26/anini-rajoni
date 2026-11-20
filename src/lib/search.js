@@ -40,3 +40,12 @@ export function matchesText(query, text) {
   const words = full.split(/[\s,.\-/]+/).filter(Boolean);
   return q.every((qw) => words.some((w) => wordMatches(qw, w)));
 }
+
+/** "Celovška cesta 26, vhod A" → "celovska cesta 26": for comparing a scanned address with saved ones. */
+export function addressBase(text) {
+  return normalizeName(text)
+    .replace(/[.,;]/g, ' ')
+    .replace(/\s+vhod\s+\S+.*$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}

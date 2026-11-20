@@ -26,6 +26,17 @@ export const Icon = {
   x: () => svg(<path d="M18 6 6 18M6 6l12 12" />),
   handle: () => svg(<path d="M4 8h16M4 12h16M4 16h16" />),
   reorder: () => svg(<path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4" />),
+  grid: () =>
+    svg(
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+      </>,
+    ),
+  plus: () => svg(<path d="M12 5v14M5 12h14" />),
+  minus: () => svg(<path d="M5 12h14" />),
   edit: () => svg(<path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z" />),
   arrowLeft: () => svg(<path d="M19 12H5M11 5l-7 7 7 7" />),
   arrowRight: () => svg(<path d="M5 12h14M13 5l7 7-7 7" />),

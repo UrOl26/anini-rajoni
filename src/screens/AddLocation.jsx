@@ -9,7 +9,8 @@ import { TopBar, BottomBar, Icon } from '../components/ui.jsx';
 import { CameraView, useReadLoop, scanBlocker, readerErrorMessage } from '../components/Camera.jsx';
 import { ScanBlocked } from '../components/ScanBlocked.jsx';
 
-function AddressScanner({ onFound, onClose }) {
+/** Full-screen camera that reads one address (house sign or letter). Also used on the landing screen. */
+export function AddressScanner({ onFound, onClose }) {
   const blocked = scanBlocker();
   const cam = useRef(null);
   const last = useRef(null);

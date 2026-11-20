@@ -39,6 +39,7 @@ export const sl = {
   addressPlaceholder: 'npr. Celovška cesta 12, vhod A',
   addressMissing: 'Vpiši naslov.',
   scan: 'Skeniraj',
+  scanAddress: 'Skeniraj naslov',
   scanAddressHint: 'Usmeri kamero v hišno tablico ali naslov na pismu.',
   addressNotFound: 'Naslova ni bilo mogoče prebrati.',
   manageList: 'Uredi seznam',
@@ -47,7 +48,7 @@ export const sl = {
   noLocations: 'V tem rajonu še ni lokacij.',
   noResults: 'Ni zadetkov',
   confirmDeleteLocation:
-    'Si prepričana, da želiš izbrisati? Izbrisan bo tudi razpored nabiralnikov in vsa imena.',
+    'Si prepričana, da želiš izbrisati? Izbrisan bo tudi razpored nabiralnikov in vsi priimki.',
   confirmDeleteRoute:
     'Si prepričana, da želiš izbrisati? Izbrisane bodo tudi vse lokacije v tem rajonu.',
   dragHandle: 'Premakni',
@@ -61,19 +62,19 @@ export const sl = {
   addOne: 'Dodaj',
   removeOne: 'Odstrani',
   editHint: 'Tapni nabiralnik, ki ni v uporabi.',
-  confirmRemoveNamed: 'Si prepričana, da želiš izbrisati? Ti nabiralniki imajo vpisana imena.',
+  confirmRemoveNamed: 'Si prepričana, da želiš izbrisati? Ti nabiralniki imajo vpisane priimke.',
   notInUse: 'Nabiralnik ni v uporabi',
 
   // 5.3 Scanner
-  scanNames: 'Skeniraj imena',
+  scanNames: 'Skeniraj priimke',
   enterManually: 'Vpiši ročno',
   previousMailbox: 'Prejšnji nabiralnik',
   nextMailbox: 'Naslednji nabiralnik',
-  pointAt: (n) => `Usmeri kamero v ime na nabiralniku ${n}.`,
+  pointAt: (n) => `Usmeri kamero v priimek na nabiralniku ${n}.`,
   reading: 'Berem …',
-  noName: 'Ni berljivega imena.',
+  noName: 'Ni berljivega priimka.',
   allScanned: 'Vsi nabiralniki so skenirani.',
-  maxNames: 'Največ 5 imen na nabiralnik.',
+  maxNames: 'Največ 5 priimkov na nabiralnik.',
   cameraStarting: 'Zaganjam kamero …',
   cameraFailed: 'Kamere ni bilo mogoče odpreti. Preveri dovoljenje za kamero.',
   needInternet: 'Za skeniranje potrebuješ internet.',
@@ -87,33 +88,35 @@ export const sl = {
   torchOn: 'Prižgi svetilko',
   torchOff: 'Ugasni svetilko',
 
-  // Mailbox and names
-  mailbox: (n) => `Nabiralnik ${n}`,
-  position: (n, row, col) => `Nabiralnik ${n} · ${row}. vrsta, ${col}. od leve`,
-  addName: 'Dodaj ime',
-  noNamesYet: 'Ta nabiralnik še nima imena.',
+  // Mailbox and family names. A mailbox is labelled like a chessboard: column number + row letter, e.g. 5C.
+  mailbox: (label) => `Nabiralnik ${label}`,
+  addName: 'Dodaj priimek',
+  noNamesYet: 'Ta nabiralnik še nima priimka.',
   deleteName: (name) => `Izbriši ${name}`,
 
   // 5.4 Search
   searchName: 'Išči priimek …',
   clearSearch: 'Počisti iskanje',
   scanLetter: 'Skeniraj pismo',
-  scanLetterHint: 'Usmeri kamero v ime na pismu.',
+  scanLetterHint: 'Usmeri kamero v priimek na pismu.',
   pickFamilyName: 'Kateri je priimek?',
   matches: (n) => `${n} ${plural(n, ['zadetek', 'zadetka', 'zadetki', 'zadetkov'])}`,
   tapMailboxToAdd: (name) => `Tapni nabiralnik, kamor spada ${name}.`,
+  nameNotHere: 'Priimek na tem naslovu še ne obstaja.',
+  zoomIn: 'Povečaj',
+  zoomOut: 'Pomanjšaj',
 
   // 5.5 Learning
   learnAddEmpty: (name, n) => `Dodam priimek ${name} v nabiralnik ${n}?`,
-  learnHasOne: (n, existing) => `Nabiralnik ${n} že ima ime: ${existing}. Kaj želiš narediti?`,
+  learnHasOne: (n, existing) => `Nabiralnik ${n} že ima priimek: ${existing}. Kaj želiš narediti?`,
   learnHasMany: (n, existing) =>
-    `Nabiralnik ${n} že ima imena: ${existing}. Kaj želiš narediti?`,
+    `Nabiralnik ${n} že ima priimke: ${existing}. Kaj želiš narediti?`,
   addToExistingOne: 'Dodaj k obstoječemu',
   addToExistingMany: 'Dodaj k obstoječim',
   replaceExistingOne: 'Zamenjaj obstoječe',
   replaceMany: 'Zamenjaj',
   replaceWhich: (name) => `Kaj zamenjam s priimkom ${name}?`,
-  allNames: 'Vsa imena',
+  allNames: 'Vsi priimki',
 
   // Settings and backups
   settings: 'Nastavitve',
@@ -123,7 +126,7 @@ export const sl = {
   apiKeyPlaceholder: 'sk-ant-…',
   deleteKey: 'Izbriši ključ',
   backup: 'Varnostna kopija',
-  backupHint: 'Shrani kopijo vseh rajonov, razporedov in imen, npr. v Datoteke ali iCloud Drive.',
+  backupHint: 'Shrani kopijo vseh rajonov, razporedov in priimkov, npr. v Datoteke ali iCloud Drive.',
   exportData: 'Izvozi',
   importData: 'Uvozi',
   lastBackup: (date) => `Zadnja varnostna kopija: ${date}`,
