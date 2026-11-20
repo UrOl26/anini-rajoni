@@ -4,9 +4,16 @@ import { sl } from '../i18n/sl.js';
 import { MAX_NAMES_PER_MAILBOX } from '../lib/names.js';
 import { Sheet, Icon, toast } from './ui.jsx';
 
-/** Edit, delete or add the names of one mailbox. */
-export function NamesSheet({ title, names, onSave, onCancel }) {
-  const [draft, setDraft] = useState(names.length ? [...names] : ['']);
+/**
+ * Edit, delete or add the names of one mailbox.
+ * addNew: also start with an empty row for a new name (manual entry in the scanner).
+ */
+export function NamesSheet({ title, names, onSave, onCancel, addNew = false }) {
+  const [draft, setDraft] = useState(() => {
+    if (!names.length) return [''];
+    if (addNew && names.length < MAX_NAMES_PER_MAILBOX) return [...names, ''];
+    return [...names];
+  });
   const set = (i, v) => setDraft(draft.map((n, j) => (j === i ? v : n)));
   const add = () => {
     if (draft.length >= MAX_NAMES_PER_MAILBOX) return toast(sl.maxNames);

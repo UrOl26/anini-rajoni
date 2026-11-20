@@ -8,7 +8,8 @@ import { normalizeName, MAX_NAMES_PER_MAILBOX } from '../lib/names.js';
 import { readNames, canvasToJpegBase64, getApiKey } from '../lib/cloudReader.js';
 import { signature, sameView } from '../lib/camera.js';
 import { Grid } from '../components/Grid.jsx';
-import { TopBar, BottomBar, InputSheet, toast } from '../components/ui.jsx';
+import { TopBar, BottomBar, Icon, toast } from '../components/ui.jsx';
+import { NamesSheet } from '../components/MailboxSheets.jsx';
 import { CameraView, useReadLoop, scanBlocker, readerErrorMessage } from '../components/Camera.jsx';
 import { ScanBlocked } from '../components/ScanBlocked.jsx';
 
@@ -45,7 +46,6 @@ export function Scanner({ locationId }) {
     const i = cells.findIndex((c) => !namesOf(layout, c.key).length);
     return i === -1 ? 0 : i;
   });
-  const [previous, setPrevious] = useState(null); // { idx, returnTo } while adding to the previous mailbox
   const [status, setStatus] = useState('');
   const [chip, setChip] = useState(null);
   const [justSaved, setJustSaved] = useState(null);
@@ -57,8 +57,7 @@ export function Scanner({ locationId }) {
   const lastSig = useRef(null);
   const lastSaved = useRef(''); // normalized names of the last saved label
 
-  const targetIdx = previous ? previous.idx : idx;
-  const target = cells[targetIdx];
+  const target = cells[idx];
 
   const flash = (key, names) => {
     setJustSaved(key);
@@ -67,15 +66,7 @@ export function Scanner({ locationId }) {
     setTimeout(() => setChip(null), CHIP_MS);
   };
 
-  const advanceFrom = (i) => {
-    if (i + 1 >= cells.length) {
-      setDone(true);
-      return;
-    }
-    setIdx(i + 1);
-  };
-
-  /** Saves names to the target mailbox and moves on. */
+  /** Saves names to the current mailbox. Stays on it: Ana moves on with the → arrow. */
   const saveToTarget = (read) => {
     const current = findLocation(locationId).layout;
     const existing = namesOf(current, target.key);
@@ -84,12 +75,6 @@ export function Scanner({ locationId }) {
     setMailboxNames(locationId, target.key, names);
     lastSaved.current = normList(read);
     flash(target.key, read);
-    if (previous) {
-      setIdx(previous.returnTo);
-      setPrevious(null);
-    } else {
-      advanceFrom(idx);
-    }
   };
 
   const running = !blocked && !done && !manual && !fatal && Boolean(target);
@@ -127,29 +112,17 @@ export function Scanner({ locationId }) {
     return true;
   });
 
-  const skip = () => {
-    setPrevious(null);
-    const data = findLocation(locationId).layout;
-    const next = cells.findIndex((c, i) => i > idx && !namesOf(data, c.key).length);
-    if (next === -1) setDone(true);
-    else setIdx(next);
-    lastSaved.current = '';
+  // The last saved label is kept, so a label still in view is not saved to the next mailbox too.
+  const goNext = () => {
+    if (idx + 1 >= cells.length) setDone(true);
+    else setIdx(idx + 1);
   };
 
-  const addToPrevious = () => {
-    if (idx === 0) return;
-    setPrevious({ idx: idx - 1, returnTo: idx });
-    lastSaved.current = '';
-    lastSig.current = null;
+  const goPrevious = () => {
+    if (idx > 0) setIdx(idx - 1);
   };
 
-  const info = done
-    ? sl.allScanned
-    : previous
-      ? sl.scanningPrevious(cells[previous.idx].n)
-      : target
-        ? sl.pointAt(target.n)
-        : '';
+  const info = done ? sl.allScanned : target ? sl.pointAt(target.n) : '';
 
   return (
     <div class="screen scanner">
@@ -167,7 +140,7 @@ export function Scanner({ locationId }) {
           }}
         />
       )}
-      <div style="padding-bottom: calc(190px + var(--safe-bottom))">
+      <div style="padding-bottom: calc(96px + var(--safe-bottom))">
         {blocked && !done && (
           <div style="padding:16px 16px 0">
             <ScanBlocked reason={blocked} />
@@ -182,7 +155,6 @@ export function Scanner({ locationId }) {
           centerKey={done ? null : target?.key}
           onCellTap={(cell) => {
             if (cell.disabled) return;
-            setPrevious(null);
             setDone(false);
             setIdx(cells.findIndex((c) => c.key === cell.key));
             lastSaved.current = '';
@@ -196,32 +168,34 @@ export function Scanner({ locationId }) {
             {sl.done}
           </button>
         ) : (
-          <>
-            {idx > 0 && !previous && (
-              <button class="btn btn-text" type="button" onClick={addToPrevious}>
-                {sl.addToPrevious}
-              </button>
-            )}
-            <div class="row">
-              <button class="btn btn-secondary" type="button" onClick={skip}>
-                {sl.skip}
-              </button>
-              <button class="btn btn-secondary" type="button" onClick={() => setManual(true)}>
-                {sl.enterManually}
-              </button>
-            </div>
-          </>
+          <div class="scan-nav">
+            <button
+              class="btn btn-secondary btn-icon"
+              type="button"
+              aria-label={sl.previousMailbox}
+              disabled={idx === 0}
+              onClick={goPrevious}
+            >
+              <Icon.arrowLeft />
+            </button>
+            <button class="btn btn-secondary" type="button" onClick={() => setManual(true)}>
+              {sl.enterManually}
+            </button>
+            <button class="btn btn-secondary btn-icon" type="button" aria-label={sl.nextMailbox} onClick={goNext}>
+              <Icon.arrowRight />
+            </button>
+          </div>
         )}
       </BottomBar>
       {manual && target && (
-        <InputSheet
-          label={`${sl.familyName} · ${sl.mailbox(target.n)}`}
-          placeholder={sl.familyNamePlaceholder}
-          validate={(v) => (v ? '' : sl.familyName)}
+        <NamesSheet
+          title={sl.mailbox(target.n)}
+          names={namesOf(findLocation(locationId).layout, target.key)}
+          addNew
           onCancel={() => setManual(false)}
-          onSave={(v) => {
+          onSave={(names) => {
             setManual(false);
-            saveToTarget([v]);
+            setMailboxNames(locationId, target.key, names);
             lastSaved.current = '';
           }}
         />

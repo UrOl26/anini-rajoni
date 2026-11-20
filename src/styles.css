@@ -114,6 +114,10 @@ h1, h2, p { margin: 0; }
   border-top: 1px solid #e5e7eb;
 }
 .bottombar .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* Scanner: ← Vpiši ročno → in one row */
+.scan-nav { display: grid; grid-template-columns: 64px 1fr 64px; gap: 8px; }
+.btn-icon { padding: 0; }
+.btn-icon svg { width: 30px; height: 30px; }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -322,6 +326,9 @@ h1, h2, p { margin: 0; }
   -webkit-overflow-scrolling: touch;
 }
 .grid {
+  /* Every cell has room for the number and all 5 names (max per mailbox). */
+  --cell-w: 88px;
+  --cell-h: 122px;
   display: grid;
   gap: 4px;
   width: max-content;
@@ -340,8 +347,8 @@ h1, h2, p { margin: 0; }
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  width: 72px;
-  height: 64px;
+  width: var(--cell-w);
+  height: var(--cell-h);
   padding: 4px 6px;
   border: 1px solid #9ca3af;
   border-radius: 8px;
@@ -355,17 +362,10 @@ h1, h2, p { margin: 0; }
 .cell .name {
   width: 100%;
   font-size: 15px;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.cell .more {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-2);
 }
 .cell.disabled {
   border-color: #9ca3af;

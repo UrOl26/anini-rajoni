@@ -66,10 +66,9 @@ export const sl = {
 
   // 5.3 Scanner
   scanNames: 'Skeniraj imena',
-  skip: 'Preskoči',
   enterManually: 'Vpiši ročno',
-  addToPrevious: 'Dodaj ime prejšnjemu nabiralniku',
-  scanningPrevious: (n) => `Dodajam imena nabiralniku ${n}.`,
+  previousMailbox: 'Prejšnji nabiralnik',
+  nextMailbox: 'Naslednji nabiralnik',
   pointAt: (n) => `Usmeri kamero v ime na nabiralniku ${n}.`,
   reading: 'Berem …',
   noName: 'Ni berljivega imena.',

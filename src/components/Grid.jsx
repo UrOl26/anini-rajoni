@@ -70,8 +70,12 @@ export function Grid({ layout, mode = 'view', current, matches, justSaved, cente
           onClick={() => onCellTap?.({ r, c, key, n, disabled })}
         >
           {!disabled && <span class="num">{n}</span>}
-          {!disabled && names[0] && <span class="name">{names[0]}</span>}
-          {!disabled && names.length > 1 && <span class="more">+{names.length - 1}</span>}
+          {!disabled &&
+            names.map((name, i) => (
+              <span key={i} class="name">
+                {name}
+              </span>
+            ))}
         </button>,
       );
     }
@@ -81,7 +85,7 @@ export function Grid({ layout, mode = 'view', current, matches, justSaved, cente
     <div class={`grid-wrap ${extra}`} ref={wrapRef}>
       <div
         class={`grid ${mode}`}
-        style={`grid-template-columns: 24px repeat(${layout.cols}, 72px); grid-template-rows: 20px repeat(${layout.rows}, 64px);`}
+        style={`grid-template-columns: 24px repeat(${layout.cols}, var(--cell-w)); grid-template-rows: 20px repeat(${layout.rows}, var(--cell-h));`}
       >
         {cells}
       </div>
