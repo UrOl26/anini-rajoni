@@ -124,8 +124,8 @@ export const sl = {
 
   // Scanner activation (QR code with the API key)
   activateScanner: 'Aktiviraj skener',
-  activateBannerHint: 'Za branje priimkov s kamero.',
-  reactivateBannerHint: 'Skener ne deluje več. Tapni in poskeniraj novo kodo.',
+  activateBannerHint: 'Za branje priimkov s kamero. Pokliči Uršo.',
+  reactivateBannerHint: 'Skener ne deluje več. Tapni in poskeniraj novo kodo. Pokliči Uršo.',
   activateHint: 'Usmeri kamero v kodo za aktivacijo.',
   notActivationCode: 'To ni koda za aktivacijo skenerja.',
   checkingCode: 'Preverjam kodo …',

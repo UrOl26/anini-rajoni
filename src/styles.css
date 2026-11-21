@@ -213,17 +213,17 @@ h1, h2, p { margin: 0; }
   font-size: 16px;
   text-align: left;
 }
-/* „Aktiviraj skener“: the dark primary colour, so it reads as an action, not a warning. */
+/* „Aktiviraj skener“: strong yellow with navy text, stronger than the pale backup reminder. */
 .banner.activate {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--primary);
-  color: #fff;
+  background: var(--match);
+  color: var(--primary);
 }
 .banner.activate svg { flex: none; width: 28px; height: 28px; }
 .banner.activate strong { display: block; font-size: 18px; }
-.banner.activate span { display: block; font-size: 15px; color: #e5e7f0; }
+.banner.activate span { display: block; font-size: 15px; color: var(--primary); }
 
 /* ---------- Inputs ---------- */
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
