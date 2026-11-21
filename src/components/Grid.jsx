@@ -1,10 +1,10 @@
 // The mailbox grid: a simple drawing of the wall (5.2, DESIGN.md "The mailbox grid").
 // Columns are numbered, rows lettered, like a chessboard: mailbox "5C".
-// With `zoomable`, the grid starts scaled to fit the screen and can be zoomed with two fingers or + / −.
+// With `zoomable`, the grid starts scaled to fit the screen and can be zoomed with two fingers
+// (phone, Mac trackpad) or with ⌘ / Ctrl + mouse wheel (computer).
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { sl } from '../i18n/sl.js';
 import { cellKey, cellLabel, rowLetter, namesOf } from '../lib/layout.js';
-import { Icon } from './ui.jsx';
 
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -17,9 +17,7 @@ const GUIDE_H = 20;
 const MIN_GUIDE_W = 14;
 const MIN_GUIDE_H = 14;
 const WRAP_PAD_X = 32; // 16 px on each side
-const ZOOM_BTNS_W = 64; // room on the right for + / −, so they don't cover mailboxes when fitted
 const WRAP_PAD_Y = 20; // 4 px top + 16 px bottom
-const ZOOM_STEP = 1.3;
 // Below these sizes the names, then the labels, no longer fit.
 const NAMES_MIN_SCALE = 0.8;
 const LABEL_MIN_W = 26;
@@ -66,7 +64,7 @@ function fitScale(rows, cols, availW, availH) {
  * picking: true while choosing a mailbox for a new family name – active cells get the "pick" look
  * justSaved: key that shows the green check
  * centerKey: when it changes, that cell slides to the middle
- * zoomable: fit to screen + pinch / + − zoom
+ * zoomable: fit to screen + pinch / ⌘-wheel zoom
  * fitKey: whenever it changes, the grid is fitted to the screen again
  */
 export function Grid({
@@ -98,7 +96,7 @@ export function Grid({
     const top = wrap.getBoundingClientRect().top + window.scrollY;
     const bar = document.querySelector('.bottombar')?.offsetHeight ?? 0;
     const h = Math.max(160, screenHeight() - top - bar - 8);
-    const availW = wrap.clientWidth - WRAP_PAD_X - ZOOM_BTNS_W;
+    const availW = wrap.clientWidth - WRAP_PAD_X;
     const s = fitScale(layout.rows, layout.cols, availW, h - WRAP_PAD_Y);
     setWrapH(h);
     setMinScale(s);
@@ -164,7 +162,7 @@ export function Grid({
     pendingScroll.current = null;
   }, [scale]);
 
-  // Two-finger pinch. Listeners are added by hand so touchmove can stop the page from zooming.
+  // Two-finger pinch and ⌘-wheel. Listeners are added by hand so they can stop the page from zooming.
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!zoomable || !wrap) return;
@@ -186,6 +184,14 @@ export function Grid({
       if (e.touches.length < 2) pinch.current = null;
     };
     const stopGesture = (e) => e.preventDefault(); // Safari's own page zoom
+    // Computer: ⌘ or Ctrl + mouse wheel. A Mac trackpad pinch also arrives as a wheel event with ctrlKey.
+    const wheel = (e) => {
+      if (!e.ctrlKey && !e.metaKey) return; // plain wheel just scrolls
+      e.preventDefault();
+      const r = wrap.getBoundingClientRect();
+      zoomRef.current(scaleRef.current * Math.exp(-e.deltaY * 0.01), e.clientX - r.left, e.clientY - r.top);
+    };
+    wrap.addEventListener('wheel', wheel, { passive: false });
     wrap.addEventListener('touchstart', start, { passive: true });
     wrap.addEventListener('touchmove', move, { passive: false });
     wrap.addEventListener('touchend', end, { passive: true });
@@ -197,6 +203,7 @@ export function Grid({
       wrap.removeEventListener('touchend', end);
       wrap.removeEventListener('touchcancel', end);
       wrap.removeEventListener('gesturestart', stopGesture);
+      wrap.removeEventListener('wheel', wheel);
     };
   }, [zoomable]);
 
@@ -292,30 +299,5 @@ export function Grid({
     </div>
   );
 
-  if (!zoomable) return grid;
-  return (
-    <div class="grid-zoom">
-      {grid}
-      <div class="zoom-btns">
-        <button
-          class="icon-btn"
-          type="button"
-          aria-label={sl.zoomIn}
-          disabled={scale >= 1}
-          onClick={() => zoomTo(scale * ZOOM_STEP)}
-        >
-          <Icon.plus />
-        </button>
-        <button
-          class="icon-btn"
-          type="button"
-          aria-label={sl.zoomOut}
-          disabled={scale <= minScale}
-          onClick={() => zoomTo(scale / ZOOM_STEP)}
-        >
-          <Icon.minus />
-        </button>
-      </div>
-    </div>
-  );
+  return grid;
 }

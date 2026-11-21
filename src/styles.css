@@ -427,26 +427,9 @@ h1, h2, p { margin: 0; }
 .grid.z-label .cell.match,
 .grid.z-empty .cell.match { transform: none; }
 
-/* Zoomable grid: scrolls inside its own box, + / − buttons in the corner. */
-.grid-zoom { position: relative; }
+/* Zoomable grid: scrolls inside its own box. */
 .grid-wrap.zoomable,
 .grid-wrap.zoomable .cell { touch-action: pan-x pan-y; overscroll-behavior: contain; }
-/* Always bottom right, just above the bottom bar – the keyboard doesn't move them. */
-.zoom-btns {
-  position: fixed;
-  z-index: 5;
-  right: 16px;
-  bottom: calc(92px + var(--safe-bottom));
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.zoom-btns .icon-btn {
-  background: var(--card);
-  border: 2px solid var(--primary);
-  box-shadow: 0 2px 8px rgba(0, 2, 45, 0.18);
-}
-.zoom-btns .icon-btn:disabled { opacity: 0.35; }
 
 /* Family name not on this wall */
 .search.not-found,

@@ -35,8 +35,6 @@ export const Icon = {
         <rect x="14" y="14" width="7" height="7" rx="1" />
       </>,
     ),
-  plus: () => svg(<path d="M12 5v14M5 12h14" />),
-  minus: () => svg(<path d="M5 12h14" />),
   edit: () => svg(<path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z" />),
   arrowLeft: () => svg(<path d="M19 12H5M11 5l-7 7 7 7" />),
   arrowRight: () => svg(<path d="M5 12h14M13 5l7 7-7 7" />),

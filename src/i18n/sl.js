@@ -109,8 +109,6 @@ export const sl = {
   matches: (n) => `${n} ${plural(n, ['zadetek', 'zadetka', 'zadetki', 'zadetkov'])}`,
   tapMailboxToAdd: (name) => `Tapni nabiralnik, kamor spada ${name}.`,
   nameNotHere: 'Priimek na tem naslovu še ne obstaja.',
-  zoomIn: 'Povečaj',
-  zoomOut: 'Pomanjšaj',
 
   // 5.5 Learning
   learnAddEmpty: (name, n) => `Dodam priimek ${name} v nabiralnik ${n}?`,
