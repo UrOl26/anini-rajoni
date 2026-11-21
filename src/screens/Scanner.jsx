@@ -49,7 +49,7 @@ export function Scanner({ locationId }) {
   const [status, setStatus] = useState('');
   const [chip, setChip] = useState(null);
   const [justSaved, setJustSaved] = useState(null);
-  const [manual, setManual] = useState(false);
+  const [manual, setManual] = useState(false); // false | 'add' (Vpiši ročno) | 'edit' (tapped a mailbox)
   const [done, setDone] = useState(cells.length === 0);
   const [fatal, setFatal] = useState(false);
 
@@ -140,7 +140,7 @@ export function Scanner({ locationId }) {
           }}
         />
       )}
-      <div style="padding-bottom: calc(96px + var(--safe-bottom))">
+      <div class="scan-body">
         {blocked && !done && (
           <div style="padding:16px 16px 0">
             <ScanBlocked reason={blocked} />
@@ -155,10 +155,12 @@ export function Scanner({ locationId }) {
           centerKey={done ? null : target?.key}
           onCellTap={(cell) => {
             if (cell.disabled) return;
+            // Jump to the mailbox and open its names, to fix or delete a wrong scan (Popravki 5).
             setDone(false);
             setIdx(cells.findIndex((c) => c.key === cell.key));
             lastSaved.current = '';
             lastSig.current = null;
+            setManual('edit');
           }}
         />
       </div>
@@ -178,7 +180,7 @@ export function Scanner({ locationId }) {
             >
               <Icon.arrowLeft />
             </button>
-            <button class="btn btn-secondary" type="button" onClick={() => setManual(true)}>
+            <button class="btn btn-secondary" type="button" onClick={() => setManual('add')}>
               {sl.enterManually}
             </button>
             <button class="btn btn-secondary btn-icon" type="button" aria-label={sl.nextMailbox} onClick={goNext}>
@@ -191,7 +193,7 @@ export function Scanner({ locationId }) {
         <NamesSheet
           title={sl.mailbox(target.n)}
           names={namesOf(findLocation(locationId).layout, target.key)}
-          addNew
+          addNew={manual === 'add'}
           onCancel={() => setManual(false)}
           onSave={(names) => {
             setManual(false);

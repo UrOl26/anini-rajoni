@@ -527,7 +527,10 @@ h1, h2, p { margin: 0; }
   background: rgba(255, 255, 255, 0.9);
 }
 
-.scanner .camera { height: 42dvh; }
+.scanner { height: 100dvh; min-height: 0; overflow: hidden; }
+/* The camera never scrolls away: only the area below it (info + grid) scrolls. */
+.scanner .camera { flex: none; height: 42dvh; }
+.scan-body { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: calc(96px + var(--safe-bottom)); }
 .scanner .grid-wrap { margin: 0; padding: 12px 16px; }
 .scanner .scan-info { padding: 12px 16px 0; font-size: 20px; font-weight: 700; }
 

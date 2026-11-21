@@ -210,12 +210,23 @@ export function Grid({
   // ---- Slide the current mailbox / match into view ----
   useEffect(() => {
     if (!centerKey || !wrapRef.current) return;
-    const el = wrapRef.current.querySelector(`[data-key="${centerKey}"]`);
-    el?.scrollIntoView({
-      block: 'center',
-      inline: 'center',
-      behavior: reducedMotion() ? 'auto' : 'smooth',
+    const wrap = wrapRef.current;
+    const el = wrap.querySelector(`[data-key="${centerKey}"]`);
+    if (!el) return;
+    // Only the grid (and the scanner's grid area) scroll – never the whole page, so the camera stays in view.
+    const behavior = reducedMotion() ? 'auto' : 'smooth';
+    const e = el.getBoundingClientRect();
+    const w = wrap.getBoundingClientRect();
+    wrap.scrollBy({
+      left: e.left + e.width / 2 - (w.left + w.width / 2),
+      top: wrap.scrollHeight > wrap.clientHeight ? e.top + e.height / 2 - (w.top + w.height / 2) : 0,
+      behavior,
     });
+    const area = wrap.closest('.scan-body');
+    if (area) {
+      const a = area.getBoundingClientRect();
+      area.scrollBy({ top: e.top + e.height / 2 - (a.top + a.height / 2), behavior });
+    }
   }, [centerKey, layout]);
 
   // ---- Cells ----
