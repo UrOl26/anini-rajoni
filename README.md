@@ -24,9 +24,20 @@ Pushing to `main` deploys to GitHub Pages (`.github/workflows/deploy.yml`).
 - `src/screens/` – Home, RouteScreen, AddLocation, LayoutScreen, LayoutEditor, Scanner, Settings
 - `src/components/` – shared UI (cards, grid, sheets, camera)
 - `scan-test/` – standalone test page for cloud name reading
+- `aktivacija/` – page that turns an API key into an activation QR code (see below)
 - `icons-src/` – SVG sources for the app icons in `public/icons/`
 
-Reading text (names, letters, addresses) uses Claude Haiku via the Claude API, called from the phone. The API key is entered in *Nastavitve* and stored only in that browser's localStorage.
+Reading text (names, letters, addresses) uses Claude Haiku via the Claude API, called from the phone. The API key is never in the code; it is stored only in that phone's localStorage.
+
+## Scanner activation (QR code)
+
+Each person gets their own API key (one per person in the Claude Console, named after them).
+
+1. The owner opens https://urol26.github.io/anini-rajoni/aktivacija/, pastes the key (and optionally a name) and taps *Pokaži QR kodo*. The code is drawn on that device; the key is not sent anywhere or saved, except one free check (`GET /v1/models`) that it works. *Zapri in pobriši* or leaving the page wipes it.
+2. In the app, a banner *Aktiviraj skener* shows while there is no key, or after the API rejected the saved key. Tapping it opens the in-app QR scanner (`#/activate`). Scanning inside the app matters: on the iPhone a home-screen app does not share storage with Safari.
+3. The app checks the key, saves it with the name and shows *Skener je aktiviran – Ana.* An invalid code is refused; without internet the key is saved and checked on the first scan.
+
+QR text format: `anini-rajoni:aktivacija?k=<API key>&n=<name>` (URL-encoded, `n` optional). Typing the key in *Nastavitve* still works as a fallback.
 
 ## Import / backup file format
 

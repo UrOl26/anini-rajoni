@@ -12,6 +12,7 @@ import {
   findRoute,
 } from '../store.js';
 import { activeCells } from '../lib/layout.js';
+import { getApiKey, needsActivation } from '../lib/cloudReader.js';
 import { matchesText, addressBase } from '../lib/search.js';
 import { AddressScanner } from './AddLocation.jsx';
 import { CardList } from '../components/CardList.jsx';
@@ -139,6 +140,15 @@ export function Home() {
           )
         ) : (
           <>
+            {needsActivation() && (
+              <button class="banner activate" type="button" onClick={() => navigate(paths.activate())}>
+                <Icon.camera />
+                <div>
+                  <strong>{sl.activateScanner}</strong>
+                  <span>{getApiKey() ? sl.reactivateBannerHint : sl.activateBannerHint}</span>
+                </div>
+              </button>
+            )}
             {reminder && (
               <button class="banner" type="button" onClick={() => navigate(paths.settings())}>
                 {reminder}

@@ -7,6 +7,7 @@ import { LayoutScreen } from './screens/LayoutScreen.jsx';
 import { LayoutEditor } from './screens/LayoutEditor.jsx';
 import { Scanner } from './screens/Scanner.jsx';
 import { Settings } from './screens/Settings.jsx';
+import { Activate } from './screens/Activate.jsx';
 import { findLocation, findRoute, useData } from './store.js';
 
 function Screen() {
@@ -14,6 +15,7 @@ function Screen() {
   const [a, id, sub] = useRoute();
 
   if (a === 'settings') return <Settings />;
+  if (a === 'activate') return <Activate />;
 
   if (a === 'r' && findRoute(id)) {
     if (sub === 'new') return <AddLocation routeId={id} />;

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="sl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#00022D" />
+    <meta name="robots" content="noindex" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Aktivacija skenerja</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <section id="form" class="card">
+        <h1>Aktivacija skenerja</h1>
+        <p class="hint">Naredi kodo, ki jo uporabnica poskenira v aplikaciji (Aktiviraj skener).</p>
+
+        <label for="name">Za koga (neobvezno)</label>
+        <input id="name" type="text" autocomplete="off" placeholder="npr. Ana" maxlength="40" />
+
+        <label for="key">API ključ</label>
+        <input id="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" />
+        <p id="error" class="error" role="alert" hidden></p>
+
+        <button id="show" class="primary" type="button">Pokaži QR kodo</button>
+        <p class="note">Ključ ostane samo na tej napravi. Nikamor se ne pošlje in nikjer ne shrani.</p>
+      </section>
+
+      <section id="result" class="card result" hidden>
+        <p id="forWhom" class="for"></p>
+        <p class="hint">V aplikaciji tapni Aktiviraj skener in usmeri kamero sem.</p>
+        <canvas id="qr" aria-label="QR koda za aktivacijo skenerja"></canvas>
+        <p id="check" class="check">Preverjam ključ …</p>
+        <button id="close" class="secondary" type="button">Zapri in pobriši</button>
+      </section>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -29,9 +29,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,svg,png,ico}'],
-        globIgnores: ['scan-test/**', 'assets/scanTest-*'],
+        globIgnores: ['scan-test/**', 'assets/scanTest-*', 'aktivacija/**', 'assets/qrPage-*'],
         navigateFallback: '/anini-rajoni/index.html',
-        navigateFallbackDenylist: [/scan-test/],
+        navigateFallbackDenylist: [/scan-test/, /aktivacija/],
       },
     }),
   ],
@@ -40,6 +40,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         scanTest: 'scan-test/index.html',
+        qrPage: 'aktivacija/index.html',
       },
     },
   },

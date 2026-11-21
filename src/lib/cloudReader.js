@@ -19,14 +19,49 @@ export function getApiKey() {
   }
 }
 
-export function setApiKey(key) {
+const OWNER_STORAGE = 'anini.apiKeyOwner';
+const BAD_STORAGE = 'anini.apiKeyBad';
+
+/** Saves (or with '' deletes) the key. `owner` is the optional name from the activation code. */
+export function setApiKey(key, owner = '') {
   try {
+    localStorage.removeItem(BAD_STORAGE);
     if (key) localStorage.setItem(KEY_STORAGE, key);
     else localStorage.removeItem(KEY_STORAGE);
+    if (key && owner) localStorage.setItem(OWNER_STORAGE, owner);
+    else localStorage.removeItem(OWNER_STORAGE);
   } catch {
     /* storage unavailable */
   }
 }
+
+export function getApiKeyOwner() {
+  try {
+    return localStorage.getItem(OWNER_STORAGE) || '';
+  } catch {
+    return '';
+  }
+}
+
+/** True once the API has rejected the saved key (revoked or wrong). Cleared by setApiKey. */
+export function isApiKeyBad() {
+  try {
+    return localStorage.getItem(BAD_STORAGE) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markApiKeyBad() {
+  try {
+    localStorage.setItem(BAD_STORAGE, '1');
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** True when the scanner needs (re)activating: no key, or the saved key was rejected. */
+export const needsActivation = () => !getApiKey() || isApiKeyBad();
 
 const SYSTEM_PROMPT = `You read name labels on residential mailboxes in Slovenia.
 The image shows one mailbox label (printed, handwritten, engraved or embossed metal, stickers, possibly faded or reflective).
@@ -96,7 +131,10 @@ async function ask(base64Jpeg, apiKey, { system, schema, text, maxTokens = 200, 
 
   if (!res.ok) {
     const body = await res.text().catch(() => '');
-    if (res.status === 401 || res.status === 403) throw new CloudReaderError('auth', body);
+    if (res.status === 401 || res.status === 403) {
+      markApiKeyBad();
+      throw new CloudReaderError('auth', body);
+    }
     if (res.status === 429 || res.status === 529 || res.status >= 500)
       throw new CloudReaderError('busy', body);
     throw new CloudReaderError('other', `${res.status} ${body}`);

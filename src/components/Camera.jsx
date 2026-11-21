@@ -2,11 +2,11 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { sl } from '../i18n/sl.js';
 import { openCamera, closeCamera, torchSupported, setTorch, cropFrame, sleep } from '../lib/camera.js';
-import { getApiKey, CloudReaderError } from '../lib/cloudReader.js';
+import { needsActivation, CloudReaderError } from '../lib/cloudReader.js';
 import { Icon } from './ui.jsx';
 
 /**
- * Camera with a frame. `shape`: 'label' | 'envelope' | 'sign'.
+ * Camera with a frame. `shape`: 'label' | 'envelope' | 'sign' | 'qr'.
  * `onReady(api)` gives { grab(): canvas|null }.
  */
 export function CameraView({ shape = 'label', chip, chipOk, status, onReady, onError }) {
@@ -25,7 +25,7 @@ export function CameraView({ shape = 'label', chip, chipOk, status, onReady, onE
         s = st;
         setStream(st);
         onReady?.({
-          grab: () => cropFrame(videoRef.current, boxRef.current, frameRef.current),
+          grab: (opts) => cropFrame(videoRef.current, boxRef.current, frameRef.current, opts),
         });
       })
       .catch((err) => {
@@ -66,7 +66,7 @@ export function CameraView({ shape = 'label', chip, chipOk, status, onReady, onE
 
 /** Why scanning can't start right now, or '' if it can. */
 export function scanBlocker() {
-  if (!getApiKey()) return 'key';
+  if (needsActivation()) return 'key';
   if (navigator.onLine === false) return 'offline';
   return '';
 }

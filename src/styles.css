@@ -213,6 +213,17 @@ h1, h2, p { margin: 0; }
   font-size: 16px;
   text-align: left;
 }
+/* „Aktiviraj skener“: the dark primary colour, so it reads as an action, not a warning. */
+.banner.activate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--primary);
+  color: #fff;
+}
+.banner.activate svg { flex: none; width: 28px; height: 28px; }
+.banner.activate strong { display: block; font-size: 18px; }
+.banner.activate span { display: block; font-size: 15px; color: #e5e7f0; }
 
 /* ---------- Inputs ---------- */
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -483,6 +494,7 @@ h1, h2, p { margin: 0; }
 .camera .frame.label { width: 70%; aspect-ratio: 3.2 / 1; }
 .camera .frame.envelope { width: 86%; aspect-ratio: 2 / 1; }
 .camera .frame.sign { width: 80%; aspect-ratio: 2.4 / 1; }
+.camera .frame.qr { width: min(64%, 46dvh); aspect-ratio: 1; }
 .camera .frame i {
   position: absolute;
   width: 26px;
@@ -561,6 +573,7 @@ h1, h2, p { margin: 0; }
 .settings h2 { font-size: 20px; margin-bottom: 4px; }
 .settings p { color: var(--text-2); font-size: 16px; margin-bottom: 12px; }
 .settings .ok { color: var(--success); font-weight: 700; }
+.settings .bad { color: var(--danger); font-weight: 700; }
 .settings .stack { display: flex; flex-direction: column; gap: 8px; }
 
 @media (prefers-reduced-motion: reduce) {

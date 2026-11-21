@@ -1,9 +1,9 @@
-// Nastavitve: API key and backups (export / import).
+// Nastavitve: API key (activation code or typed) and backups (export / import).
 import { useRef, useState } from 'preact/hooks';
 import { sl, formatDate } from '../i18n/sl.js';
 import { navigate, paths } from '../router.js';
 import { useData, exportJson, markBackup, parseImport, importMerge, importReplace } from '../store.js';
-import { getApiKey, setApiKey } from '../lib/cloudReader.js';
+import { getApiKey, setApiKey, getApiKeyOwner, isApiKeyBad } from '../lib/cloudReader.js';
 import { TopBar, Sheet, Confirm, toast } from '../components/ui.jsx';
 
 async function shareOrDownload(text) {
@@ -67,7 +67,18 @@ export function Settings() {
           <p>{sl.apiKeyHint}</p>
           {hasKey ? (
             <div class="stack">
-              <p class="ok">✓ {sl.apiKeySaved}</p>
+              {isApiKeyBad() ? (
+                <p class="bad">{sl.apiKeyBad}</p>
+              ) : (
+                <p class="ok">✓ {getApiKeyOwner() ? sl.apiKeySavedFor(getApiKeyOwner()) : sl.apiKeySaved}</p>
+              )}
+              <button
+                class={`btn ${isApiKeyBad() ? 'btn-primary' : 'btn-secondary'}`}
+                type="button"
+                onClick={() => navigate(paths.activate())}
+              >
+                {sl.scanActivationCode}
+              </button>
               <button
                 class="btn btn-secondary"
                 type="button"
@@ -80,31 +91,37 @@ export function Settings() {
               </button>
             </div>
           ) : (
-            <form
-              class="stack"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!keyDraft.trim()) return;
-                setApiKey(keyDraft.trim());
-                setKeyDraft('');
-                setHasKey(true);
-              }}
-            >
-              <input
-                class="input"
-                type="password"
-                value={keyDraft}
-                placeholder={sl.apiKeyPlaceholder}
-                aria-label={sl.apiKey}
-                autoComplete="off"
-                autoCapitalize="off"
-                spellcheck={false}
-                onInput={(e) => setKeyDraft(e.currentTarget.value)}
-              />
-              <button class="btn btn-primary" type="submit">
-                {sl.save}
+            <div class="stack">
+              <button class="btn btn-primary" type="button" onClick={() => navigate(paths.activate())}>
+                {sl.scanActivationCode}
               </button>
-            </form>
+              <p style="margin:8px 0 0">{sl.orEnterKey}</p>
+              <form
+                class="stack"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!keyDraft.trim()) return;
+                  setApiKey(keyDraft.trim());
+                  setKeyDraft('');
+                  setHasKey(true);
+                }}
+              >
+                <input
+                  class="input"
+                  type="password"
+                  value={keyDraft}
+                  placeholder={sl.apiKeyPlaceholder}
+                  aria-label={sl.apiKey}
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  spellcheck={false}
+                  onInput={(e) => setKeyDraft(e.currentTarget.value)}
+                />
+                <button class="btn btn-secondary" type="submit">
+                  {sl.save}
+                </button>
+              </form>
+            </div>
           )}
         </section>
 

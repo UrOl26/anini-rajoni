@@ -1,4 +1,4 @@
-// Tiny hash router: #/, #/r/<id>, #/r/<id>/new, #/l/<id>, #/l/<id>/edit, #/l/<id>/scan, #/settings
+// Tiny hash router: #/, #/r/<id>, #/r/<id>/new, #/l/<id>, #/l/<id>/edit, #/l/<id>/scan, #/settings, #/activate
 import { useEffect, useState } from 'preact/hooks';
 
 const parse = () => location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -31,4 +31,5 @@ export const paths = {
   editLayout: (id) => `/l/${id}/edit`,
   scan: (id) => `/l/${id}/scan`,
   settings: () => '/settings',
+  activate: () => '/activate',
 };
